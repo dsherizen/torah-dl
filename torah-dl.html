@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Torah-dl</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #FCF6EC;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ── Header ── */
+    header {
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    header h1 {
+      font-size: 1.75rem;
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-weight: 400;
+    }
+    header .feather {
+      font-size: 1.6rem;
+      line-height: 1;
+    }
+
+    /* ── Main ── */
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 3rem;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .hero h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .hero p {
+      color: #555;
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.55;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    /* ── Input row ── */
+    .input-row {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .input-wrap {
+      flex: 1;
+      min-width: 0;
+      position: relative;
+    }
+    input[type="url"] {
+      width: 100%;
+      padding: 0.6rem 2.6rem 0.6rem 0.8rem;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color .15s;
+    }
+    input[type="url"]:focus { border-color: #1E3A8A; }
+
+    .info-btn {
+      position: absolute;
+      right: 0; top: 0; bottom: 0;
+      width: 2.4rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #6b7280;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0 6px 6px 0;
+    }
+    .info-btn:hover { color: #1E3A8A; }
+
+    button.primary {
+      padding: 0.6rem 1.25rem;
+      background: #1E3A8A;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .15s, opacity .15s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    button.primary:hover:not(:disabled) { background: #1a3278; }
+    button.primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ── Spinner ── */
+    .spin {
+      display: inline-block;
+      width: 1rem; height: 1rem;
+      border: 2px solid rgba(255,255,255,.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Error ── */
+    .error {
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 6px;
+      color: #b91c1c;
+      font-size: 0.9rem;
+    }
+
+    /* ── Result ── */
+    .result {
+      margin-top: 1rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+    }
+    .result h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    .result .meta {
+      font-size: 0.82rem;
+      color: #6b7280;
+      margin-bottom: 0.9rem;
+    }
+    .dl-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1.1rem;
+      background: #1E3A8A;
+      color: #fff;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: background .15s;
+    }
+    .dl-btn:hover { background: #1a3278; }
+
+    /* ── Sites popover ── */
+    .popover-wrap { position: relative; display: inline-block; }
+    .popover {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      width: 260px;
+      max-height: 280px;
+      overflow-y: auto;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      box-shadow: 0 6px 24px rgba(0,0,0,.12);
+      padding: 0.75rem 1rem;
+      z-index: 50;
+    }
+    .popover.open { display: block; }
+    .popover h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .popover ul { list-style: none; }
+    .popover li { margin: 0.25rem 0; }
+    .popover a { font-size: 0.85rem; color: #1E3A8A; }
+    .popover a:hover { text-decoration: underline; }
+    .popover .loading { font-size: 0.85rem; color: #6b7280; }
+
+    /* ── Sponsor / social ── */
+    .card-title {
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .sponsor-frame {
+      display: flex;
+      justify-content: center;
+      overflow: hidden;
+      height: 150px;
+    }
+    .social-row {
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+    }
+    .social-link {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      color: #374151;
+      transition: color .15s;
+    }
+    .social-link:hover { color: #1E3A8A; }
+    .social-icon {
+      background: #f3f4f6;
+      border-radius: 50%;
+      width: 2.6rem; height: 2.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .social-icon svg { width: 1.25rem; height: 1.25rem; }
+    .social-label { font-size: 0.8rem; }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid #e5e7eb;
+      padding: 1.25rem;
+      text-align: center;
+      font-size: 0.82rem;
+      color: #6b7280;
+    }
+
+    /* ── Supported badge row ── */
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 1rem;
+    }
+    .badge {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.55rem;
+      background: #EFF6FF;
+      color: #1E40AF;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="feather">🪶</span>
+  <h1>Torah-dl</h1>
+</header>
+
+<main>
+  <div class="hero">
+    <h2>Download Jewish Media Content</h2>
+    <p>Paste a link from a supported Torah site to get a direct download link for the audio.</p>
+  </div>
+
+  <!-- Main extractor card -->
+  <div class="card">
+    <div class="input-row">
+      <div class="input-wrap">
+        <input
+          type="url"
+          id="urlInput"
+          placeholder="e.g. https://www.yutorah.org/lectures/1116616"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <div class="popover-wrap">
+          <button class="info-btn" id="infoBtn" title="Supported sites" aria-label="Show supported sites">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          </button>
+          <div class="popover" id="sitesPopover">
+            <h4>Supported Sites</h4>
+            <div id="sitesContent"><p class="loading">Loading…</p></div>
+          </div>
+        </div>
+      </div>
+      <button class="primary" id="submitBtn" disabled>
+        Get Download Link
+      </button>
+    </div>
+
+    <div id="error" class="error" style="display:none;"></div>
+    <div id="result" class="result" style="display:none;"></div>
+  </div>
+
+  <!-- Sponsor card -->
+  <div class="card">
+    <p class="card-title">Support this project</p>
+    <div class="sponsor-frame">
+      <iframe
+        src="https://github.com/sponsors/SoferAi/card"
+        title="Sponsor SoferAi"
+        height="150"
+        width="600"
+        style="border:0;"
+      ></iframe>
+    </div>
+  </div>
+
+  <!-- Social card -->
+  <div class="card">
+    <p class="card-title">Keep in Touch</p>
+    <div class="social-row">
+      <a class="social-link" href="https://x.com/Sofer_Ai" target="_blank" rel="noopener noreferrer">
+        <span class="social-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622Zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </span>
+        <span class="social-label">@Sofer_Ai</span>
+      </a>
+      <a class="social-link" href="https://sofer.ai" target="_blank" rel="noopener noreferrer">
+        <span class="social-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </span>
+        <span class="social-label">sofer.ai</span>
+      </a>
+      <a class="social-link" href="https://www.linkedin.com/company/soferai" target="_blank" rel="noopener noreferrer">
+        <span class="social-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        </span>
+        <span class="social-label">LinkedIn</span>
+      </a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>© <span id="year"></span> Sofer.Ai. All rights reserved.</p>
+</footer>
+
+<script>
+  const API = "https://api.sofer.ai";
+
+  // Footer year
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  // ── Input enable/disable ──
+  const urlInput = document.getElementById("urlInput");
+  const submitBtn = document.getElementById("submitBtn");
+
+  urlInput.addEventListener("input", () => {
+    submitBtn.disabled = urlInput.value.trim() === "";
+  });
+
+  urlInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !submitBtn.disabled) handleSubmit();
+  });
+
+  submitBtn.addEventListener("click", handleSubmit);
+
+  // ── Sites popover ──
+  const infoBtn = document.getElementById("infoBtn");
+  const popover = document.getElementById("sitesPopover");
+  const sitesContent = document.getElementById("sitesContent");
+  let sitesLoaded = false;
+  let popoverOpen = false;
+
+  infoBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    popoverOpen = !popoverOpen;
+    popover.classList.toggle("open", popoverOpen);
+    if (popoverOpen && !sitesLoaded) loadSites();
+  });
+
+  document.addEventListener("click", (e) => {
+    if (popoverOpen && !popover.contains(e.target) && e.target !== infoBtn) {
+      popoverOpen = false;
+      popover.classList.remove("open");
+    }
+  });
+
+  async function loadSites() {
+    try {
+      const res = await fetch(`${API}/v1/link/sites`);
+      if (!res.ok) throw new Error();
+      const sites = await res.json();
+      sitesLoaded = true;
+      sitesContent.innerHTML = `<ul>${sites.map(s =>
+        `<li><a href="${s.url}" target="_blank" rel="noopener noreferrer">${s.name}</a></li>`
+      ).join("")}</ul>`;
+    } catch {
+      sitesContent.innerHTML = `<p class="loading">Could not load sites.</p>`;
+    }
+  }
+
+  // ── Extraction ──
+  async function handleSubmit() {
+    const url = urlInput.value.trim();
+    if (!url) return;
+
+    const errorEl = document.getElementById("error");
+    const resultEl = document.getElementById("result");
+
+    errorEl.style.display = "none";
+    resultEl.style.display = "none";
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<span class="spin"></span> Processing…`;
+
+    try {
+      const res = await fetch(`${API}/v1/link/extract`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+
+      if (!res.ok) throw new Error(`Status ${res.status}`);
+
+      const data = await res.json();
+      const isAudio = (data.file_format || "").includes("audio");
+
+      resultEl.innerHTML = `
+        <h3>${escHtml(data.title || "Untitled")}</h3>
+        <p class="meta">Format: ${escHtml(data.file_format || "unknown")}</p>
+        <a class="dl-btn" href="${escHtml(data.download_url)}" download="${escHtml(data.file_name || "")}">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 10l5 5 5-5M12 3v12"/></svg>
+          Download ${isAudio ? "Audio" : "Video"}
+        </a>
+      `;
+      resultEl.style.display = "block";
+    } catch {
+      errorEl.textContent = "Failed to process this URL. Please make sure it's from a supported Jewish media site.";
+      errorEl.style.display = "block";
+    } finally {
+      submitBtn.disabled = urlInput.value.trim() === "";
+      submitBtn.innerHTML = "Get Download Link";
+    }
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+</script>
+</body>
+</html>
