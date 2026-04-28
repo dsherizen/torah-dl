@@ -251,6 +251,185 @@
       color: #6b7280;
     }
 
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      gap: 0.25rem;
+      border-bottom: 1px solid #e5e7eb;
+      margin: -0.5rem -0.5rem 1.25rem;
+      padding: 0 0.5rem;
+    }
+    .tab {
+      padding: 0.6rem 1rem;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-size: 0.92rem;
+      color: #6b7280;
+      font-weight: 500;
+      margin-bottom: -1px;
+    }
+    .tab.active {
+      color: #1E3A8A;
+      border-bottom-color: #1E3A8A;
+    }
+    .tab:hover:not(.active) { color: #374151; }
+
+    /* ── Bulk mode ── */
+    textarea.bulk {
+      width: 100%;
+      min-height: 110px;
+      padding: 0.7rem 0.8rem;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      resize: vertical;
+      outline: none;
+    }
+    textarea.bulk:focus { border-color: #1E3A8A; }
+
+    .bulk-actions {
+      display: flex;
+      gap: 0.6rem;
+      margin-top: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .bulk-hint {
+      font-size: 0.78rem;
+      color: #6b7280;
+      margin-top: 0.5rem;
+      line-height: 1.5;
+    }
+    .bulk-hint code {
+      background: #f3f4f6;
+      padding: 0.05rem 0.3rem;
+      border-radius: 3px;
+      font-size: 0.85em;
+    }
+
+    /* ── Listing tip ── */
+    .listing-tip {
+      margin-top: 1rem;
+      padding: 0.85rem 1rem;
+      background: #FFFBEB;
+      border: 1px solid #FDE68A;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      color: #78350F;
+      line-height: 1.5;
+    }
+    .listing-tip strong { color: #92400E; }
+
+    /* ── Progress ── */
+    .progress {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: #6b7280;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: #f3f4f6;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 0.4rem;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: #1E3A8A;
+      transition: width .2s;
+    }
+
+    /* ── Bulk results list ── */
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 1.25rem 0 0.6rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .results-header .count {
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+    .results-header .small-actions {
+      display: flex;
+      gap: 0.4rem;
+    }
+    .small-btn {
+      padding: 0.3rem 0.65rem;
+      font-size: 0.78rem;
+      background: #fff;
+      color: #374151;
+      border: 1px solid #d1d5db;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .small-btn:hover { background: #f9fafb; }
+
+    .results-list {
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      max-height: 380px;
+      overflow-y: auto;
+    }
+    .result-item {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.6rem 0.85rem;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 0.88rem;
+    }
+    .result-item:last-child { border-bottom: none; }
+    .result-item input[type="checkbox"] {
+      flex-shrink: 0;
+      width: 1rem;
+      height: 1rem;
+      cursor: pointer;
+    }
+    .result-item .info {
+      flex: 1;
+      min-width: 0;
+    }
+    .result-item .title {
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .result-item .url {
+      font-size: 0.74rem;
+      color: #9ca3af;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .result-item.pending .title { color: #9ca3af; font-style: italic; }
+    .result-item.error { background: #fef2f2; }
+    .result-item.error .title { color: #b91c1c; }
+    .result-item .item-dl {
+      flex-shrink: 0;
+      padding: 0.3rem 0.7rem;
+      background: #1E3A8A;
+      color: #fff;
+      border-radius: 5px;
+      font-size: 0.78rem;
+      font-weight: 500;
+    }
+    .result-item .item-dl:hover { background: #1a3278; }
+
+    .bulk-footer {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.85rem;
+      flex-wrap: wrap;
+    }
+
     /* ── Supported badge row ── */
     .badge-row {
       display: flex;
@@ -283,32 +462,83 @@
 
   <!-- Main extractor card -->
   <div class="card">
-    <div class="input-row">
-      <div class="input-wrap">
-        <input
-          type="url"
-          id="urlInput"
-          placeholder="e.g. https://www.yutorah.org/lectures/1116616"
-          autocomplete="off"
-          spellcheck="false"
-        />
-        <div class="popover-wrap">
-          <button class="info-btn" id="infoBtn" title="Supported sites" aria-label="Show supported sites">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          </button>
-          <div class="popover" id="sitesPopover">
-            <h4>Supported Sites</h4>
-            <div id="sitesContent"><p class="loading">Loading…</p></div>
-          </div>
-        </div>
-      </div>
-      <button class="primary" id="submitBtn" disabled>
-        Get Download Link
-      </button>
+    <div class="tabs">
+      <button class="tab active" data-tab="single" id="tabSingle">Single URL</button>
+      <button class="tab" data-tab="bulk" id="tabBulk">Bulk / Series</button>
     </div>
 
-    <div id="error" class="error" style="display:none;"></div>
-    <div id="result" class="result" style="display:none;"></div>
+    <!-- Single URL mode -->
+    <div id="paneSingle">
+      <div class="input-row">
+        <div class="input-wrap">
+          <input
+            type="url"
+            id="urlInput"
+            placeholder="e.g. https://www.yutorah.org/lectures/1116616"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <div class="popover-wrap">
+            <button class="info-btn" id="infoBtn" title="Supported sites" aria-label="Show supported sites">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            </button>
+            <div class="popover" id="sitesPopover">
+              <h4>Supported Sites</h4>
+              <div id="sitesContent"><p class="loading">Loading…</p></div>
+            </div>
+          </div>
+        </div>
+        <button class="primary" id="submitBtn" disabled>
+          Get Download Link
+        </button>
+      </div>
+
+      <div id="error" class="error" style="display:none;"></div>
+      <div id="result" class="result" style="display:none;"></div>
+    </div>
+
+    <!-- Bulk mode -->
+    <div id="paneBulk" hidden>
+      <textarea class="bulk" id="bulkInput" placeholder="Paste shiur URLs (one per line), or paste raw text/HTML from a teacher or series page — we'll find the links automatically.
+
+Example:
+https://www.yutorah.org/lectures/1116616
+https://outorah.org/p/212365
+https://torahanytime.com/lectures/335042"></textarea>
+
+      <div class="bulk-hint">
+        <strong>Tip:</strong> on a teacher/series page (YUTorah, OUTorah, etc.), press <code>Ctrl+U</code> to view source, <code>Ctrl+A</code> to select all, <code>Ctrl+C</code> to copy — then paste here.
+      </div>
+
+      <div class="bulk-actions">
+        <button class="primary" id="bulkBtn">Find &amp; Extract</button>
+        <button class="small-btn" id="bulkClearBtn">Clear</button>
+      </div>
+
+      <div id="listingTip" class="listing-tip" style="display:none;"></div>
+
+      <div id="bulkProgress" class="progress" style="display:none;">
+        <span id="progressText"></span>
+        <div class="progress-bar"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+      </div>
+
+      <div id="bulkResults" style="display:none;">
+        <div class="results-header">
+          <span class="count" id="resultsCount">0 shiurim</span>
+          <div class="small-actions">
+            <button class="small-btn" id="selectAllBtn">Select all</button>
+            <button class="small-btn" id="selectNoneBtn">None</button>
+          </div>
+        </div>
+        <div class="results-list" id="resultsList"></div>
+        <div class="bulk-footer">
+          <button class="primary" id="downloadSelectedBtn">Download selected</button>
+          <button class="small-btn" id="copyUrlsBtn">Copy URLs</button>
+          <button class="small-btn" id="exportTxtBtn">Export .txt</button>
+          <button class="small-btn" id="exportShBtn">Export wget script</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Sponsor card -->
@@ -461,6 +691,283 @@
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
   }
+
+  // ─────────── Tab switching ───────────
+  const paneSingle = document.getElementById("paneSingle");
+  const paneBulk = document.getElementById("paneBulk");
+  const tabSingle = document.getElementById("tabSingle");
+  const tabBulk = document.getElementById("tabBulk");
+
+  function setTab(name) {
+    const isSingle = name === "single";
+    tabSingle.classList.toggle("active", isSingle);
+    tabBulk.classList.toggle("active", !isSingle);
+    paneSingle.hidden = !isSingle;
+    paneBulk.hidden = isSingle;
+  }
+  tabSingle.addEventListener("click", () => setTab("single"));
+  tabBulk.addEventListener("click", () => setTab("bulk"));
+
+  // ─────────── Bulk: shiur URL patterns ───────────
+  const SHIUR_PATTERNS = [
+    /https?:\/\/(?:www\.)?yutorah\.org\/lectures\/(?:lecture\.cfm\/\d+|details\?shiurid=\d+|\d+)[^\s"'<>\n]*/gi,
+    /https?:\/\/(?:www\.)?outorah\.org\/p\/\d+/gi,
+    /https?:\/\/(?:www\.)?alldaf\.org\/p\/\d+/gi,
+    /https?:\/\/(?:www\.)?allparsha\.org\/p\/\d+/gi,
+    /https?:\/\/(?:www\.)?torahanytime\.com\/lectures\/\d+/gi,
+    /https?:\/\/(?:www\.)?MyTAT\.me\/a\d+/gi,
+    /https?:\/\/(?:www\.)?torahdownloads\.com\/shiur-\d+\.html/gi,
+    /https?:\/\/(?:www\.)?naaleh\.com\/torah_library\/\?post_id=\d+/gi,
+    /https?:\/\/(?:www\.)?torahweb\.org\/audio\/[a-z0-9_]+\.html/gi,
+    /https?:\/\/(?:the)?torahapp\.org\/share\/p\/[^\s"'<>\n]+/gi,
+    /https?:\/\/(?:www\.)?mp3shiur\.com\/prodDetails\.asp\?[^\s"'<>\n]+/gi,
+    /https?:\/\/(?:www\.)?nishmat\.net\/lesson\/[^\s"'<>\n\/?]+\/?/gi,
+    /https?:\/\/(?:www\.)?torahmediaamerica\.com\/shiur-\d+\.html/gi,
+    /https?:\/\/(?:www\.)?orayta\.org\/[^\s"'<>\n]*shiurID=\d+[^\s"'<>\n]*/gi,
+    /https?:\/\/(?:www\.)?kolhalashon\.com\/[^\s"'<>\n]*(?:FileName=\d+|playShiur\/\d+)[^\s"'<>\n]*/gi,
+  ];
+
+  // Listing-page hints (shown when input is a single listing URL)
+  const LISTING_HINTS = [
+    { re: /yutorah\.org\/teachers\/details/i, label: "YUTorah teacher page", tip: "viewSource" },
+    { re: /yutorah\.org\/series\/details/i, label: "YUTorah series page", tip: "viewSource" },
+    { re: /yutorah\.org\/(teachers|series|search|publications)/i, label: "YUTorah listing page", tip: "viewSource" },
+    { re: /torahanytime\.com.*(?:speaker|series|#\/)/i, label: "TorahAnytime listing page", tip: "tat" },
+    { re: /outorah\.org\/(rabbi|r|series|s)\/?\d*/i, label: "OUTorah series/rabbi page", tip: "viewSource" },
+    { re: /alldaf\.org\/(rabbi|series|masechta)/i, label: "AllDaf listing page", tip: "viewSource" },
+    { re: /allparsha\.org\/(rabbi|series|parsha)/i, label: "AllParsha listing page", tip: "viewSource" },
+    { re: /torahdownloads\.com\/(category|speaker|series)/i, label: "TorahDownloads category", tip: "rightClick" },
+    { re: /naaleh\.com\/(course|category|teacher)/i, label: "Naaleh course/category page", tip: "rightClick" },
+  ];
+
+  const TIPS = {
+    viewSource: 'Open the link in your browser, press <code>Ctrl+U</code> to view source, then <code>Ctrl+A</code> + <code>Ctrl+C</code>, then paste it back here.',
+    rightClick: 'Right-click each lecture title on the listing page → <em>Copy link address</em> → paste them here, one per line.',
+    tat: 'TorahAnytime loads lectures dynamically — viewing source won\'t include them. Instead, scroll the page to load all lectures, right-click each one, choose <em>Copy link address</em>, and paste here.',
+  };
+
+  function detectListingPage(text) {
+    const trimmed = text.trim();
+    if (!trimmed || trimmed.includes("\n")) return null;
+    if (!/^https?:\/\//.test(trimmed)) return null;
+    for (const hint of LISTING_HINTS) {
+      if (hint.re.test(trimmed)) return hint;
+    }
+    return null;
+  }
+
+  function extractShiurUrls(text) {
+    const found = new Set();
+    for (const pat of SHIUR_PATTERNS) {
+      const matches = text.match(pat);
+      if (matches) matches.forEach(u => found.add(u.replace(/[)\].,;]+$/, "")));
+    }
+    return Array.from(found);
+  }
+
+  // ─────────── Bulk UI elements ───────────
+  const bulkInput = document.getElementById("bulkInput");
+  const bulkBtn = document.getElementById("bulkBtn");
+  const bulkClearBtn = document.getElementById("bulkClearBtn");
+  const listingTip = document.getElementById("listingTip");
+  const bulkProgress = document.getElementById("bulkProgress");
+  const progressText = document.getElementById("progressText");
+  const progressFill = document.getElementById("progressFill");
+  const bulkResults = document.getElementById("bulkResults");
+  const resultsCount = document.getElementById("resultsCount");
+  const resultsList = document.getElementById("resultsList");
+  const selectAllBtn = document.getElementById("selectAllBtn");
+  const selectNoneBtn = document.getElementById("selectNoneBtn");
+  const downloadSelectedBtn = document.getElementById("downloadSelectedBtn");
+  const copyUrlsBtn = document.getElementById("copyUrlsBtn");
+  const exportTxtBtn = document.getElementById("exportTxtBtn");
+  const exportShBtn = document.getElementById("exportShBtn");
+
+  let bulkResultsData = [];
+
+  // Show listing tip while typing
+  bulkInput.addEventListener("input", () => {
+    const hint = detectListingPage(bulkInput.value);
+    if (hint) {
+      listingTip.style.display = "block";
+      listingTip.innerHTML = `<strong>Looks like a ${hint.label}.</strong> ${TIPS[hint.tip]}`;
+    } else {
+      listingTip.style.display = "none";
+    }
+  });
+
+  bulkClearBtn.addEventListener("click", () => {
+    bulkInput.value = "";
+    listingTip.style.display = "none";
+    bulkResults.style.display = "none";
+    bulkProgress.style.display = "none";
+    bulkResultsData = [];
+  });
+
+  bulkBtn.addEventListener("click", runBulk);
+
+  async function runBulk() {
+    const text = bulkInput.value;
+    const urls = extractShiurUrls(text);
+
+    if (urls.length === 0) {
+      const hint = detectListingPage(text);
+      if (hint) {
+        listingTip.style.display = "block";
+        listingTip.innerHTML = `<strong>Looks like a ${hint.label}.</strong> ${TIPS[hint.tip]}`;
+      } else {
+        listingTip.style.display = "block";
+        listingTip.innerHTML = `<strong>No shiur URLs found.</strong> Paste shiur links one per line, or paste the HTML source of a listing page.`;
+      }
+      return;
+    }
+
+    // Initialize results
+    bulkResultsData = urls.map(u => ({ url: u, status: "pending", title: u, downloadUrl: null, fileName: null, fileFormat: null }));
+    renderResults();
+    bulkResults.style.display = "block";
+    bulkProgress.style.display = "block";
+
+    let done = 0;
+    const total = bulkResultsData.length;
+    const concurrency = 5;
+    let idx = 0;
+
+    function updateProgress() {
+      const pct = Math.round((done / total) * 100);
+      progressText.textContent = `Extracting ${done} of ${total}…`;
+      progressFill.style.width = pct + "%";
+    }
+    updateProgress();
+
+    async function worker() {
+      while (idx < total) {
+        const i = idx++;
+        const item = bulkResultsData[i];
+        try {
+          const res = await fetch(`${API}/v1/link/extract`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: item.url }),
+          });
+          if (!res.ok) throw new Error("status " + res.status);
+          const data = await res.json();
+          item.status = "ok";
+          item.title = data.title || item.url;
+          item.downloadUrl = data.download_url;
+          item.fileName = data.file_name;
+          item.fileFormat = data.file_format;
+        } catch (e) {
+          item.status = "error";
+          item.title = "Failed: " + item.url;
+        }
+        done++;
+        updateProgress();
+        renderResults();
+      }
+    }
+
+    const workers = Array.from({ length: Math.min(concurrency, total) }, () => worker());
+    await Promise.all(workers);
+
+    progressText.textContent = `Done — ${bulkResultsData.filter(x => x.status === "ok").length} of ${total} extracted.`;
+  }
+
+  function renderResults() {
+    const okCount = bulkResultsData.filter(x => x.status === "ok").length;
+    resultsCount.textContent = `${bulkResultsData.length} shiurim · ${okCount} ready`;
+    resultsList.innerHTML = bulkResultsData.map((item, i) => {
+      const cls = item.status === "pending" ? "pending" : (item.status === "error" ? "error" : "");
+      const dl = item.status === "ok"
+        ? `<a class="item-dl" href="${escHtml(item.downloadUrl)}" download="${escHtml(item.fileName || '')}">Download</a>`
+        : "";
+      const checkbox = item.status === "ok"
+        ? `<input type="checkbox" data-idx="${i}" checked>`
+        : `<input type="checkbox" data-idx="${i}" disabled>`;
+      return `
+        <div class="result-item ${cls}">
+          ${checkbox}
+          <div class="info">
+            <div class="title">${escHtml(item.title)}</div>
+            <div class="url">${escHtml(item.url)}</div>
+          </div>
+          ${dl}
+        </div>
+      `;
+    }).join("");
+  }
+
+  selectAllBtn.addEventListener("click", () => {
+    resultsList.querySelectorAll('input[type="checkbox"]:not(:disabled)').forEach(cb => cb.checked = true);
+  });
+  selectNoneBtn.addEventListener("click", () => {
+    resultsList.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+  });
+
+  function getSelected() {
+    const idxs = Array.from(resultsList.querySelectorAll('input[type="checkbox"]:checked'))
+      .map(cb => parseInt(cb.dataset.idx, 10));
+    return idxs.map(i => bulkResultsData[i]).filter(x => x && x.status === "ok");
+  }
+
+  downloadSelectedBtn.addEventListener("click", async () => {
+    const items = getSelected();
+    if (items.length === 0) { alert("No items selected."); return; }
+    for (const item of items) {
+      const a = document.createElement("a");
+      a.href = item.downloadUrl;
+      a.download = item.fileName || "";
+      a.target = "_blank";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      await new Promise(r => setTimeout(r, 1200));
+    }
+  });
+
+  copyUrlsBtn.addEventListener("click", async () => {
+    const items = getSelected();
+    if (items.length === 0) { alert("No items selected."); return; }
+    const text = items.map(x => x.downloadUrl).join("\n");
+    try {
+      await navigator.clipboard.writeText(text);
+      copyUrlsBtn.textContent = "Copied!";
+      setTimeout(() => copyUrlsBtn.textContent = "Copy URLs", 1500);
+    } catch {
+      alert("Couldn't copy. URLs:\n\n" + text);
+    }
+  });
+
+  function downloadFile(content, filename, mime) {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  exportTxtBtn.addEventListener("click", () => {
+    const items = getSelected();
+    if (items.length === 0) { alert("No items selected."); return; }
+    const text = items.map(x => x.downloadUrl).join("\n");
+    downloadFile(text, "torah-dl-urls.txt", "text/plain");
+  });
+
+  exportShBtn.addEventListener("click", () => {
+    const items = getSelected();
+    if (items.length === 0) { alert("No items selected."); return; }
+    const lines = ["#!/bin/bash", "# Generated by torah-dl"];
+    for (const item of items) {
+      const safeName = (item.fileName || "shiur.mp3").replace(/'/g, "'\\''");
+      const safeUrl = item.downloadUrl.replace(/'/g, "'\\''");
+      lines.push(`wget -c -O '${safeName}' '${safeUrl}'`);
+    }
+    downloadFile(lines.join("\n") + "\n", "torah-dl-download.sh", "text/x-shellscript");
+  });
 </script>
 </body>
 </html>
