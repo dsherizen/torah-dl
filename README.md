@@ -33,6 +33,26 @@ print(extraction.file_format) # audio/mp3
 print(extraction.file_name) # ketuvot-57a-b---preparation-for-nisuin.mp3
 ```
 
+## Bulk: download a whole teacher's / series' shiurim
+
+`torah-dl` can also enumerate every shiur on a listing page and download them in one shot:
+
+```bash
+# List every shiur by a YUTorah teacher
+torah-dl list-shiurim "https://www.yutorah.org/teachers/details/?teacherID=80714"
+
+# Or just the URLs, one per line (pipe to xargs, etc.)
+torah-dl list-shiurim --urls-only "https://www.yutorah.org/series/details/?seriesid=234"
+
+# Download every shiur from a listing page into ./audio
+torah-dl bulk-download "https://outorah.org/r/238" ./audio
+
+# Cap how many to download
+torah-dl bulk-download "https://allparsha.org/parsha/mishpatim" ./audio --limit 10
+```
+
+Listing extractors currently support: YUTorah teacher & series pages, OUTorah rabbi & series pages, AllDaf, AllParsha.
+
 ## What sites does it support?
 
 Here is the list of sites that `torah-dl` supports already, and what's coming soon:
