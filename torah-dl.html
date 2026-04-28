@@ -499,15 +499,17 @@
 
     <!-- Bulk mode -->
     <div id="paneBulk" hidden>
-      <textarea class="bulk" id="bulkInput" placeholder="Paste shiur URLs (one per line), or paste raw text/HTML from a teacher or series page — we'll find the links automatically.
+      <textarea class="bulk" id="bulkInput" placeholder="Paste a teacher / series page URL — we'll fetch it for you and pull every shiur.
 
-Example:
-https://www.yutorah.org/lectures/1116616
-https://outorah.org/p/212365
-https://torahanytime.com/lectures/335042"></textarea>
+Or paste multiple shiur URLs (one per line), or raw HTML from any listing page.
+
+Examples:
+https://www.yutorah.org/teachers/details/?teacherID=80714
+https://outorah.org/r/238
+https://www.yutorah.org/lectures/1116616"></textarea>
 
       <div class="bulk-hint">
-        <strong>Tip:</strong> on a teacher/series page (YUTorah, OUTorah, etc.), press <code>Ctrl+U</code> to view source, <code>Ctrl+A</code> to select all, <code>Ctrl+C</code> to copy — then paste here.
+        <strong>How it works:</strong> paste a single listing-page URL and we fetch it for you (via CORS proxy). For sites that load lectures with JavaScript (TorahAnytime), paste the URLs directly or use the source-paste workaround.
       </div>
 
       <div class="bulk-actions">
@@ -692,6 +694,75 @@ https://torahanytime.com/lectures/335042"></textarea>
       .replace(/"/g, "&quot;");
   }
 
+  // ─────────── CORS proxy (so we can actually fetch listing pages) ───────────
+  // Multiple fallback proxies in case one is rate-limited or down.
+  const CORS_PROXIES = [
+    url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+    url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+  ];
+
+  async function fetchViaProxy(url, opts = {}) {
+    let lastErr;
+    for (const make of CORS_PROXIES) {
+      try {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 20000);
+        const res = await fetch(make(url), { signal: ctrl.signal, ...opts });
+        clearTimeout(timer);
+        if (res.ok) {
+          const text = await res.text();
+          if (text && text.length > 100) return text;
+        }
+      } catch (e) { lastErr = e; }
+    }
+    throw lastErr || new Error("All CORS proxies failed");
+  }
+
+  // Try several URL variants to maximize chance of getting useful HTML/RSS.
+  async function fetchListingPages(url) {
+    const variants = expandListingUrls(url);
+    const fetched = [];
+    for (const v of variants) {
+      try {
+        const html = await fetchViaProxy(v);
+        fetched.push(html);
+        // If we already found a useful number of shiur URLs, stop.
+        if (extractShiurUrls(fetched.join("\n")).length >= 20) break;
+      } catch {}
+    }
+    return fetched;
+  }
+
+  // Generate URL variants likely to contain a teacher's/series' shiurim.
+  // Includes RSS feeds and pagination where known.
+  function expandListingUrls(url) {
+    const out = [url];
+    const yuTeacher = url.match(/yutorah\.org\/teachers\/details\/?\?teacherID=(\d+)/i);
+    if (yuTeacher) {
+      const id = yuTeacher[1];
+      out.push(`https://www.yutorah.org/teacherRSS.cfm?teacherID=${id}`);
+      out.push(`https://www.yutorah.org/Search/?teacher_id=${id}&pageNumber=1`);
+      for (let p = 2; p <= 5; p++) {
+        out.push(`https://www.yutorah.org/Search/?teacher_id=${id}&pageNumber=${p}`);
+      }
+    }
+    const yuSeries = url.match(/yutorah\.org\/series\/details\/?\?seriesid=(\d+)/i);
+    if (yuSeries) {
+      const id = yuSeries[1];
+      out.push(`https://www.yutorah.org/seriesRSS.cfm?seriesID=${id}`);
+      for (let p = 1; p <= 5; p++) {
+        out.push(`https://www.yutorah.org/Search/?series_id=${id}&pageNumber=${p}`);
+      }
+    }
+    const ouRabbi = url.match(/outorah\.org\/[rs]\/(\d+)/i);
+    if (ouRabbi) {
+      // OU's listing pages embed the same s3Url-pattern shiur links we'd get from /p/{id}
+      // We already pull from the original URL.
+    }
+    return Array.from(new Set(out));
+  }
+
   // ─────────── Tab switching ───────────
   const paneSingle = document.getElementById("paneSingle");
   const paneBulk = document.getElementById("paneBulk");
@@ -807,17 +878,42 @@ https://torahanytime.com/lectures/335042"></textarea>
   bulkBtn.addEventListener("click", runBulk);
 
   async function runBulk() {
-    const text = bulkInput.value;
+    let text = bulkInput.value;
+    listingTip.style.display = "none";
+
+    // If input is a single listing-page URL, try to auto-fetch it via CORS proxy.
+    const singleUrl = text.trim();
+    const isSingleUrl = /^https?:\/\/\S+$/.test(singleUrl);
+    const hint = isSingleUrl ? detectListingPage(singleUrl) : null;
+
+    if (hint) {
+      bulkProgress.style.display = "block";
+      progressFill.style.width = "10%";
+      progressText.textContent = `Fetching ${hint.label}…`;
+
+      try {
+        const pages = await fetchListingPages(singleUrl);
+        if (pages.length === 0) throw new Error("no pages fetched");
+        text = pages.join("\n");
+        progressText.textContent = `Page fetched. Scanning for shiur URLs…`;
+        progressFill.style.width = "20%";
+      } catch (e) {
+        bulkProgress.style.display = "none";
+        listingTip.style.display = "block";
+        listingTip.innerHTML = `<strong>Couldn't auto-fetch ${escHtml(hint.label)}.</strong> ${TIPS[hint.tip]}`;
+        return;
+      }
+    }
+
     const urls = extractShiurUrls(text);
 
     if (urls.length === 0) {
-      const hint = detectListingPage(text);
+      bulkProgress.style.display = "none";
+      listingTip.style.display = "block";
       if (hint) {
-        listingTip.style.display = "block";
-        listingTip.innerHTML = `<strong>Looks like a ${hint.label}.</strong> ${TIPS[hint.tip]}`;
+        listingTip.innerHTML = `<strong>Fetched the ${escHtml(hint.label)} but couldn't find shiur URLs in it.</strong> The page likely loads its content with JavaScript. ${TIPS[hint.tip]}`;
       } else {
-        listingTip.style.display = "block";
-        listingTip.innerHTML = `<strong>No shiur URLs found.</strong> Paste shiur links one per line, or paste the HTML source of a listing page.`;
+        listingTip.innerHTML = `<strong>No shiur URLs found.</strong> Paste shiur links one per line, paste a listing page URL on its own (we'll fetch it), or paste page source.`;
       }
       return;
     }
